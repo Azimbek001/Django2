@@ -21,17 +21,26 @@ from django.urls import path
 from django.conf.urls.static import static
 
 from ShopDjango import settings
-from posts.views import main_view, products_view, hashtags_view, show_categories, post_detail_view
+from posts import views
+from users import views as users_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', main_view),
+    path('', views.main_view),
 
-    path('products/', products_view),
-    path('products/<int:id>/', post_detail_view),
+    path('products/', views.products_view),
+    path('categories/', views.show_categories),
+    path('products/<int:id>/', views.post_detail_view),
+    path('products/create/', views.post_create_view),
 
-    path('hashtags/', hashtags_view),
-    path('categories/', show_categories),
+
+    path('hashtags/', views.hashtags_view),
+
+    path('users/register/', users_views.register_view),
+    path('users/login/', users_views.login_view),
+    path('users/logout/', users_views.logout_view),
+
+
 
 
 ]

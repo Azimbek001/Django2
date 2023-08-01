@@ -7,14 +7,17 @@
             margin-left: 10%;
             padding: 10px;
         }
+
         .image > img {
             width: 100%;
         }
+
         .dates {
             display: flex;
             justify-content: space-between;
         }
     </style>
+
     <div class="post">
         <div class="image">
             <img src="/media/{{ product.image }}/" alt="">
@@ -25,6 +28,18 @@
             <div class="dates">
                 <h4>{{ product.created_date }}</h4>
                 <h4>{{ product.modified_date }}</h4>
+                <div class="create_review">
+                    <form action="/products/{{ product.id }}/" method="post">
+                        {% csrf_token %}
+                        {{ form }}
+                        <input type="submit" value="Add comment">
+                    </form>
+                </div>
+                {% for review in reviews %}
+                    <div class="review_block">
+                        <h5>{{ review.text }}</h5>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>

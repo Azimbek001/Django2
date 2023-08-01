@@ -1,5 +1,6 @@
-from django.shortcuts import render
-from posts.models import Product, Hashtag, Category
+from django.shortcuts import render, redirect, get_object_or_404
+from posts.models import Product, Hashtag, Category, Review
+from posts.forms import ProductCreateForm, ReviewCreateForm
 
 
 def main_view(request):
@@ -12,7 +13,8 @@ def products_view(request):
         products = Product.objects.all()
 
         context_data = {
-            'posts': products
+            'posts': products,
+            'user': request.user
         }
 
         return render(request, 'products/products.html', context=context_data)
@@ -46,6 +48,49 @@ def post_detail_view(request, id):
         }
 
         return render(request, 'products/detail.html', context=context_data)
+    if request.method == "POST":
+        product = Product.objects.get(id=id)
+        form = ReviewCreateForm(data=request.POST)
+
+        if form.is_valid():
+            Review.objects.create(
+                text=form.cleaned_data.get('text'),
+                product_id=id
+            )
+
+        context = {
+            'product': product,
+            'reviews': product.reviews.all(),
+            'form': form
+        }
+        return render(request, 'products/detail.html', context=context)
+
+
+def post_create_view(request):
+    if request.method == 'GET':
+        context_data = {
+            'form': ProductCreateForm()
+        }
+        return render(request, 'products/create.html', context=context_data)
+
+    if request.method == 'POST':
+        data = request.POST
+        form = ProductCreateForm(data)
+
+        if form.is_valid():
+            Product.objects.create(
+                title=form.cleaned_data.get('title'),
+                description=form.cleaned_data.get('description'),
+            )
+            return redirect('/products/')
+
+        return render(request, 'products/create.html', context={
+            'form': form
+        })
+
+
+
+
 
 
 

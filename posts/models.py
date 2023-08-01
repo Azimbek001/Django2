@@ -24,3 +24,11 @@ class Product(models.Model):
     '''hashtags'''
     hashtags = models.ManyToManyField(Hashtag)
 
+
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    text = models.TextField()
+
+    def __str__(self):
+        return f"Отзыв для продукта '{self.product.name}'"
+
