@@ -1,6 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q
+from django.shortcuts import render, redirect
 from posts.models import Product, Hashtag, Category, Review
 from posts.forms import ProductCreateForm, ReviewCreateForm
+from posts.constants import PAGINATION_LIMIT
 
 
 def main_view(request):
@@ -10,11 +12,32 @@ def main_view(request):
 
 def products_view(request):
     if request.method == 'GET':
+        print(request.GET)
         products = Product.objects.all()
+
+        max_page = products.__len__() / PAGINATION_LIMIT
+        if round(max_page) < max_page:
+            max_page = round(max_page) + 1
+        else:
+            max_page = round(max_page)
+
+        search_text = request.GET.get('search')
+        page = int(request.GET.get('page', 1))
+
+        if search_text:
+            """ startswith, endswith, icontains """
+            products = products.filter(Q(title__icontains=search_text) |
+                                       Q(description__icontains=search_text))
+
+        """Pagination"""
+        products = products[PAGINATION_LIMIT * (page - 1):PAGINATION_LIMIT * page]
+
+
 
         context_data = {
             'posts': products,
-            'user': request.user
+            'user': request.user,
+            'pages': range(1, max_page + 1)
         }
 
         return render(request, 'products/products.html', context=context_data)
